@@ -1,0 +1,13 @@
+{% extends "template.twig" %}
+
+{% block content %}
+
+    {# Usually helpful to import header here #}
+
+    {% block templateContent %}
+        {{ primer.items|raw }}
+    {% endblock %}
+
+    {# Usually helpful to import footer here #}
+
+{% endblock %}
