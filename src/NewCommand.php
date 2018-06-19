@@ -4,10 +4,6 @@ namespace Rareloop\Pebble\Installer;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 use Rareloop\Lumberjack\Installer\NewCommand as LumberjackNewCommand;
 
 class NewCommand extends LumberjackNewCommand
@@ -21,15 +17,43 @@ class NewCommand extends LumberjackNewCommand
         $this->addArgument(
             'name',
             InputArgument::OPTIONAL,
-            'The name of the folder to create (defaults to `'.$this->defaultFolderName.'`)'
+            'The name of the folder to create (defaults to `' . $this->defaultFolderName . '`)'
         );
     }
 
-    protected function install(InputInterface $input, OutputInterface $output)
+    protected function install()
     {
         parent::install($input, $output);
 
         $this->setupPrimer();
+    }
+
+    protected function getServiceProviders() : array
+    {
+        return array_merge(
+            parent::getServiceProviders(),
+            [
+                'Rareloop\Lumberjack\Primer\PrimerServiceProvider::class',
+            ]
+        );
+    }
+
+    protected function getComposerDependencies() : array
+    {
+        return array_merge(
+            parent::getComposerDependencies(),
+            [
+                'rareloop/lumberjack-core',
+                'rareloop/lumberjack-primer',
+            ]
+        );
+    }
+
+    protected function getTemplateLoadPaths() : array
+    {
+        return [
+            'views/patterns',
+        ];
     }
 
     protected function setupPrimer()
@@ -46,54 +70,23 @@ class NewCommand extends LumberjackNewCommand
     {
         $this->output->writeln('<info>- Install Primer Patterns</info>');
 
-        $tempDownloadPath = sys_get_temp_dir() . '/primer-twig-templates-'.time();
+        $tempDownloadPath = sys_get_temp_dir() . '/primer-twig-templates-' . time();
 
         $this->cloneGitRepository('git@github.com:Rareloop/primer-patterns-twig.git', $tempDownloadPath);
 
-        $commands = [
-            'mv ' . escapeshellarg($tempDownloadPath . '/patterns'). ' ' .escapeshellarg($this->themeDirectory.'/views/patterns'),
-            'rm -rf '.$tempDownloadPath,
-        ];
-
-        $process = new Process(implode(' && ', $commands));
-
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
+        $this->runCommands([
+            'mv ' . escapeshellarg($tempDownloadPath . '/patterns') . ' ' . escapeshellarg($this->themeDirectory . '/views/patterns'),
+            'rm -rf ' . $tempDownloadPath,
+        ]);
     }
 
     protected function setupPrimerViews()
     {
         $this->output->writeln('<info>- Install Primer Views</info>');
 
-        $commands = [
-            'cp -r ' . escapeshellarg(__DIR__ . '/../primer'). ' ' .escapeshellarg($this->themeDirectory.'/views/primer'),
-        ];
-
-        $process = new Process(implode(' && ', $commands));
-
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
-    }
-
-    protected function getServiceProviders()
-    {
-        return [
-            'Rareloop\Lumberjack\Primer\PrimerServiceProvider::class',
-        ];
-    }
-
-    protected function getComposerDependencies()
-    {
-        return [
-            'rareloop/lumberjack-core',
-            'rareloop/lumberjack-primer',
-        ];
+        $this->runCommands([
+            'cp -r ' . escapeshellarg(__DIR__ . '/../primer') . ' ' . escapeshellarg($this->themeDirectory . '/views/primer'),
+        ]);
     }
 
     protected function addTemplateLoadPaths()
@@ -118,32 +111,17 @@ class NewCommand extends LumberjackNewCommand
         file_put_contents($configPath, $appConfig);
     }
 
-    protected function getTemplateLoadPaths()
-    {
-        return [
-            'views/patterns',
-        ];
-    }
-
     protected function copyStaticPrimerAssets()
     {
         $this->output->writeln('<info>- Copying Primer assets</info>');
 
         $primerCorePath = $this->projectPath . '/vendor/rareloop/primer-core';
 
-        $commands = [
-            'mkdir ' . escapeshellarg($this->themeDirectory.'/assets/primer'),
-            'cp -r ' . escapeshellarg($primerCorePath . '/css'). ' ' .escapeshellarg($this->themeDirectory.'/assets/primer/css'),
-            'cp -r ' . escapeshellarg($primerCorePath . '/js'). ' ' .escapeshellarg($this->themeDirectory.'/assets/primer/js'),
-            'cp -r ' . escapeshellarg($primerCorePath . '/img'). ' ' .escapeshellarg($this->themeDirectory.'/assets/primer/img'),
-        ];
-
-        $process = new Process(implode(' && ', $commands));
-
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
+        $this->runCommands([
+            'mkdir ' . escapeshellarg($this->themeDirectory . '/assets/primer'),
+            'cp -r ' . escapeshellarg($primerCorePath . '/css') . ' ' . escapeshellarg($this->themeDirectory . '/assets/primer/css'),
+            'cp -r ' . escapeshellarg($primerCorePath . '/js') . ' ' . escapeshellarg($this->themeDirectory . '/assets/primer/js'),
+            'cp -r ' . escapeshellarg($primerCorePath . '/img') . ' ' . escapeshellarg($this->themeDirectory . '/assets/primer/img'),
+        ]);
     }
 }
