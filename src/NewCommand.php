@@ -23,7 +23,7 @@ class NewCommand extends LumberjackNewCommand
 
     protected function install()
     {
-        parent::install($input, $output);
+        parent::install();
 
         $this->setupPrimer();
     }
