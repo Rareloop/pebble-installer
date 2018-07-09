@@ -8,18 +8,9 @@ use Rareloop\Lumberjack\Installer\NewCommand as LumberjackNewCommand;
 
 class NewCommand extends LumberjackNewCommand
 {
-    protected $defaultFolderName = 'pebble-site';
+    protected $description = 'Create a new Pebble project';
 
-    protected function configure()
-    {
-        $this->setName('new');
-        $this->setDescription('Create a new Pebble project');
-        $this->addArgument(
-            'name',
-            InputArgument::OPTIONAL,
-            'The name of the folder to create (defaults to `' . $this->defaultFolderName . '`)'
-        );
-    }
+    protected $defaultFolderName = 'pebble-site';
 
     protected function install()
     {
