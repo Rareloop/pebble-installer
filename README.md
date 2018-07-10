@@ -15,3 +15,7 @@ pebble new my-site
 ```
 
 The above command will create a folder in your current directory called `my-site` which contains Bedrock with Lumberjack & Primer ready to go.
+
+## Options
+
+- `--with-trellis`: Set up the project with [Trellis](https://roots.io/trellis/) for deployment.
