@@ -3,7 +3,7 @@
     "require": {
         "symfony/console": "~3.0|~4.0",
         "symfony/process": "~3.0|~4.0",
-        "rareloop/lumberjack-bedrock-installer": "^0.4.0"
+        "rareloop/lumberjack-bedrock-installer": "^1.0.0"
     },
     "autoload": {
         "psr-4": {
