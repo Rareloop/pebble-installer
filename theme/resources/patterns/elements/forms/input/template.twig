@@ -1,0 +1,14 @@
+{% set attrString = '' %}
+{% for attr in attributes %}
+    {% if attr.key and attr.value %}
+        {% set attrString = attrString ~ ' ' ~ attr.key ~ '=' ~ attr.value ~ '' %}
+    {% else %}
+        {% set attrString = attrString ~ ' ' ~ attr %}
+    {% endif %}
+{% endfor %}
+
+{% if id is not defined %}
+    {% set id = name %}
+{% endif %}
+
+<input{% if classes %} class="{% for class in classes %} {{ class }}{% endfor %}"{% endif %} name="{{ name }}" id="{{ id }}" type="{{ type|default('text') }}" value="{{ value }}"{% if placeholder %} placeholder="{{ placeholder }}"{% endif %}{{ attrString }}>

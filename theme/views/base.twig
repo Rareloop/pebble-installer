@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html {{ site.language_attributes }} {% if primer.ui %} class="primer-html primer-core"{% endif %}>
+    <head>
+        {% include 'html-header.twig' %}
+
+        {% if primer.ui %}
+            {% include 'primer-head.twig' %}
+        {% endif %}
+    </head>
+    <body{% if primer.ui %} class="primer-body{% if document %} primer-body--document{% endif %}"{% endif %}>
+        {% block templateContent %}
+            <p>Sorry, no content</p>
+        {% endblock %}
+
+        {% include 'html-footer.twig' %}
+    </body>
+</html>
