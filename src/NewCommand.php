@@ -19,7 +19,7 @@ class NewCommand extends LumberjackNewCommand
         $this->setupPrimer();
     }
 
-    protected function getServiceProviders() : array
+    protected function getServiceProviders(): array
     {
         return array_merge(
             parent::getServiceProviders(),
@@ -29,18 +29,18 @@ class NewCommand extends LumberjackNewCommand
         );
     }
 
-    protected function getComposerDependencies() : array
+    protected function getComposerDependencies(): array
     {
         return array_merge(
             parent::getComposerDependencies(),
             [
                 'rareloop/lumberjack-core',
-                'rareloop/lumberjack-primer',
+                'rareloop/lumberjack-primer:\<1.0.0',
             ]
         );
     }
 
-    protected function getTemplateLoadPaths() : array
+    protected function getTemplateLoadPaths(): array
     {
         return [
             'views/patterns',
