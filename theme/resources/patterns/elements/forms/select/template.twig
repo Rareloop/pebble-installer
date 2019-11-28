@@ -1,0 +1,18 @@
+{% set attrString = '' %}
+{% for attr in attrs %}
+    {% if attr.key and attr.value %}
+        {% set attrString = attrString ~ ' ' ~ attr.key ~ '=' ~ attr.value ~ '' %}
+    {% else %}
+        {% set attrString = attrString ~ ' ' ~ attr %}
+    {% endif %}
+{% endfor %}
+
+<select{% if classes %} class="{% for class in classes %} {{ class }}{% endfor %}"{% endif %} title="{{ title }}" name="{{ name }}" id="{{ name }}" {{ attrString }}>
+    {% for option in options %}
+        {% if option.value == selectedValue %}
+            <option value="{{ option.value }}" selected>{{ option.copy }}</option>
+        {% else %}
+            <option value="{{ option.value }}">{{ option.copy }}</option>
+        {% endif %}
+    {% endfor %}
+</select>

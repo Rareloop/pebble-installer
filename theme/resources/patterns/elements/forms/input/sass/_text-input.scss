@@ -1,0 +1,8 @@
+%text-input {
+    padding: 0.65em;
+    width: 100%;
+}
+
+input {
+    @extend %text-input;
+}

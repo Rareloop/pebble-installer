@@ -1,0 +1,18 @@
+<!-- Primer CSS Assets -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,500,500i" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="{{ primer.cssUrl }}" media="screen, handheld" />
+
+<script>
+    window.primerEnhanced = (
+        'querySelector' in document &&
+        'addEventListener' in window &&
+        'classList' in document.createElement('div')
+    );
+
+    if (window.primerEnhanced) {
+        var h = document.documentElement;
+        h.classList.add('primer-enhanced');
+        h.classList.remove('primer-core');
+    }
+</script>
+<script src="{{ primer.jsUrl }}" async type="text/javascript" charset="utf-8"></script>

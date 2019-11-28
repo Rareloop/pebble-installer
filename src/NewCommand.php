@@ -35,7 +35,7 @@ class NewCommand extends LumberjackNewCommand
             parent::getComposerDependencies(),
             [
                 'rareloop/lumberjack-core',
-                'rareloop/lumberjack-primer:\<1.0.0',
+                'rareloop/lumberjack-primer:^1.0.0',
             ]
         );
     }
@@ -43,7 +43,8 @@ class NewCommand extends LumberjackNewCommand
     protected function getTemplateLoadPaths(): array
     {
         return [
-            'views/patterns',
+            'resources/patterns',
+            'resources/templates',
         ];
     }
 
@@ -51,32 +52,85 @@ class NewCommand extends LumberjackNewCommand
     {
         $this->output->writeln('<info>Installing Primer</info>');
 
-        $this->setupPrimerTemplates();
-        $this->setupPrimerViews();
+        $this->upgradeLumberjackTemplatesToPrimer();
+        $this->copyThemeAssets();
         $this->addTemplateLoadPaths();
-        $this->copyStaticPrimerAssets();
+        // $this->addPrimerAlias();
     }
 
-    protected function setupPrimerTemplates()
+    protected function upgradeLumberjackTemplatesToPrimer()
     {
-        $this->output->writeln('<info>- Install Primer Patterns</info>');
+        $this->output->writeln('<info>- Upgrade Lumberjack templates/Controllers for Primer compatibility</info>');
 
-        $tempDownloadPath = sys_get_temp_dir() . '/primer-twig-templates-' . time();
+        $templates = [
+            'posts',
+            'home',
+            'generic-page',
+            'errors/404',
+            'errors/whoops',
+        ];
 
-        $this->cloneGitRepository('git@github.com:Rareloop/primer-patterns-twig.git', $tempDownloadPath);
+        $controllers = [
+            '404.php',
+            'archive.php',
+            'author.php',
+            'index.php',
+            'page.php',
+            'search.php',
+            'single.php',
+        ];
 
-        $this->runCommands([
-            'mv ' . escapeshellarg($tempDownloadPath . '/patterns') . ' ' . escapeshellarg($this->themeDirectory . '/views/patterns'),
-            'rm -rf ' . $tempDownloadPath,
-        ]);
+        $this->moveLumberjackTwigFiles($templates);
+        $this->updateControllerTwigPaths($controllers);
+        $this->updateExceptionHandler();
+        $this->upgradeLumberjackTwigFilesContentBlocks($templates);
     }
 
-    protected function setupPrimerViews()
+    protected function updateExceptionHandler()
     {
-        $this->output->writeln('<info>- Install Primer Views</info>');
+        $contents = file_get_contents($this->themeDirectory . '/app/Exceptions/Handler.php');
+
+        $contents = str_replace('templates/errors/whoops.twig', 'errors/whoops', $contents);
+
+        file_put_contents($this->themeDirectory . '/app/Exceptions/Handler.php', $contents);
+    }
+
+    protected function moveLumberjackTwigFiles(array $templates)
+    {
+        foreach ($templates as $template) {
+            mkdir($this->themeDirectory . '/resources/templates/' . $template, 0777, true);
+            rename($this->themeDirectory . '/views/templates/' . $template . '.twig', $this->themeDirectory . '/resources/templates/' . $template . '/template.twig');
+        }
+    }
+
+    protected function updateControllerTwigPaths(array $controllers)
+    {
+        foreach ($controllers as $controller) {
+            $contents = file_get_contents($this->themeDirectory . '/' . $controller);
+
+            $contents = preg_replace('/TimberResponse\(\'templates\/(.*?)\.twig\'/', 'TimberResponse(\'$1\'', $contents);
+
+            file_put_contents($this->themeDirectory . '/' . $controller, $contents);
+        }
+    }
+
+    protected function upgradeLumberjackTwigFilesContentBlocks(array $templates)
+    {
+        foreach ($templates as $template) {
+            $contents = file_get_contents($this->themeDirectory . '/resources/templates/' . $template . '/template.twig');
+
+            $contents = str_replace('{% block content %}', '{% block templateContent %}', $contents);
+
+            file_put_contents($this->themeDirectory . '/resources/templates/' . $template . '/template.twig', $contents);
+        }
+    }
+
+    protected function copyThemeAssets()
+    {
+        $this->output->writeln('<info>- Adding Primer theme modifications</info>');
 
         $this->runCommands([
-            'cp -r ' . escapeshellarg(__DIR__ . '/../primer') . ' ' . escapeshellarg($this->themeDirectory . '/views/primer'),
+            'cp -r ' . escapeshellarg(__DIR__ . '/../theme/') . ' ' . escapeshellarg($this->themeDirectory),
         ]);
     }
 
@@ -97,22 +151,8 @@ class NewCommand extends LumberjackNewCommand
             return "'{$path}'";
         }, $paths);
 
-        $appConfig = str_replace("'paths' => [", "'paths' => [\n\t\t" . implode(",\n\t\t", $paths) . ",", $appConfig);
+        $appConfig = str_replace("'paths' => [", "'paths' => [\n        " . implode(",\n        ", $paths) . ",", $appConfig);
 
         file_put_contents($configPath, $appConfig);
-    }
-
-    protected function copyStaticPrimerAssets()
-    {
-        $this->output->writeln('<info>- Copying Primer assets</info>');
-
-        $primerCorePath = $this->projectPath . '/vendor/rareloop/primer-core';
-
-        $this->runCommands([
-            'mkdir ' . escapeshellarg($this->themeDirectory . '/assets/primer'),
-            'cp -r ' . escapeshellarg($primerCorePath . '/css') . ' ' . escapeshellarg($this->themeDirectory . '/assets/primer/css'),
-            'cp -r ' . escapeshellarg($primerCorePath . '/js') . ' ' . escapeshellarg($this->themeDirectory . '/assets/primer/js'),
-            'cp -r ' . escapeshellarg($primerCorePath . '/img') . ' ' . escapeshellarg($this->themeDirectory . '/assets/primer/img'),
-        ]);
     }
 }
