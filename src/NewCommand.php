@@ -94,6 +94,9 @@ class NewCommand extends LumberjackNewCommand
         $this->updateControllerTwigPaths($controllers);
         $this->updateExceptionHandler();
         $this->upgradeLumberjackTwigFilesContentBlocks($templates);
+
+        rmdir($this->themeDirectory . '/views/templates/errors');
+        rmdir($this->themeDirectory . '/views/templates');
     }
 
     protected function updateExceptionHandler()
