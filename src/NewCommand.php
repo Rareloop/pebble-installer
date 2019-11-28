@@ -48,6 +48,16 @@ class NewCommand extends LumberjackNewCommand
         ];
     }
 
+    protected function packagesToCheckForUpdates(): array
+    {
+        return array_merge(
+            parent::packagesToCheckForUpdates(),
+            [
+                'rareloop/pebble-installer',
+            ]
+        );
+    }
+
     protected function setupPrimer()
     {
         $this->output->writeln('<info>Installing Primer</info>');
