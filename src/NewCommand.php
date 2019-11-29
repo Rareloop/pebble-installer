@@ -145,6 +145,13 @@ class NewCommand extends LumberjackNewCommand
         $this->runCommands([
             'cp -r ' . escapeshellarg(__DIR__ . '/../theme/') . ' ' . escapeshellarg($this->themeDirectory),
         ]);
+
+        $patternTemplate = file_get_contents($this->projectPath . '/vendor/rareloop/primer-frontend/twig/views/primer-pattern.twig');
+
+        $patternTemplate = str_replace('{{ pattern.template }}', '{{ pattern.template|e(\'html\') }}', $patternTemplate);
+        $patternTemplate = str_replace('{{ html|trim }}', '{{ html|e(\'html\')|trim }}', $patternTemplate);
+
+        file_put_contents($this->themeDirectory . '/views/primer-pattern.twig', $patternTemplate);
     }
 
     protected function addTemplateLoadPaths()
