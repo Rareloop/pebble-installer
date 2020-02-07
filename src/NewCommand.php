@@ -17,6 +17,10 @@ class NewCommand extends LumberjackNewCommand
         parent::install();
 
         $this->setupPrimer();
+
+        if ($this->installTrellis) {
+            $this->enableComposerScriptsToRunOnTrellisDeploy();
+        }
     }
 
     protected function getServiceProviders(): array
@@ -56,6 +60,19 @@ class NewCommand extends LumberjackNewCommand
                 'rareloop/pebble-installer',
             ]
         );
+    }
+
+    protected function enableComposerScriptsToRunOnTrellisDeploy()
+    {
+        $this->output->writeln('<info>- Enabling Composer scripts in Trellis deploy</info>');
+
+        $deployDefaultsPath = $this->trellisPath . '/roles/deploy/defaults/main.yml';
+
+        $deployDefaults = file_get_contents($deployDefaultsPath);
+
+        $deployDefaults = str_replace('composer_no_scripts: true', 'composer_no_scripts: false', $deployDefaults);
+
+        file_put_contents($deployDefaultsPath, $deployDefaults);
     }
 
     protected function setupPrimer()
