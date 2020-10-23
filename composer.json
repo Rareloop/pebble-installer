@@ -1,9 +1,9 @@
 {
     "name": "rareloop/pebble-installer",
     "require": {
-        "symfony/console": "~3.0|~4.0",
-        "symfony/process": "~3.0|~4.0",
-        "rareloop/lumberjack-bedrock-installer": "^1.0.0"
+        "symfony/console": "^5.0",
+        "symfony/process": "^5.0",
+        "rareloop/lumberjack-bedrock-installer": "^2.0.0"
     },
     "autoload": {
         "psr-4": {

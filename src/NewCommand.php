@@ -39,7 +39,7 @@ class NewCommand extends LumberjackNewCommand
             parent::getComposerDependencies(),
             [
                 'rareloop/lumberjack-core',
-                'rareloop/lumberjack-primer:^1.0.0',
+                'rareloop/lumberjack-primer:^1.5.0',
             ]
         );
     }
